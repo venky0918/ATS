@@ -10,7 +10,7 @@ import pdf2image
 import google.generativeai as genai
 
 genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
-poppler_path = st.secrets["general"]["POPPLER_PATH"]
+
 
 # Configure Google Generative AI
 genai.configure(api_key=genai_api_key)
