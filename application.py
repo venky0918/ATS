@@ -1,6 +1,4 @@
 from dotenv import load_dotenv
-load_dotenv()
-
 import base64
 import streamlit as st
 import os
@@ -9,14 +7,15 @@ from PIL import Image
 import pdf2image
 import google.generativeai as genai
 
-genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
+# Load environment variables
+load_dotenv()
 
+# Retrieve API key from Streamlit secrets
+genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
+poppler_path = os.getenv("POPPLER_PATH")
 
 # Configure Google Generative AI
 genai.configure(api_key=genai_api_key)
-
-# Define the path to Poppler installed via Homebrew
-POPPLER_PATH = "/opt/homebrew/bin"  # Adjust this if Homebrew uses a different location
 
 # Function to get generative response
 def get_gemini_response(input, pdf_content, prompt):
@@ -29,7 +28,7 @@ def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
         try:
             # Convert the PDF to images using pdf2image
-            images = pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path=POPPLER_PATH)
+            images = pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path=poppler_path)
             first_page = images[0]
 
             # Convert the first page to bytes
