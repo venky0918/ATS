@@ -12,10 +12,10 @@ load_dotenv(dotenv_path="/Users/venkateshvidala/PycharmProjects/ATS/a.env")
 genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
 
 # Configure Google Generative AI
-api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise RuntimeError("API Key for Google Generative AI is not set in the environment variables.")
-genai.configure(api_key=api_key)
+#api_key = os.getenv("GOOGLE_API_KEY")
+#if not api_key:
+#    raise RuntimeError("API Key for Google Generative AI is not set in the environment variables.")
+genai.configure(api_key=genai_api_key)
 
 # Function to get generative response
 def get_gemini_response(input, pdf_content, prompt):
