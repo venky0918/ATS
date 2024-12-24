@@ -9,8 +9,11 @@ from PIL import Image
 import pdf2image
 import google.generativeai as genai
 
+genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
+poppler_path = st.secrets["general"]["POPPLER_PATH"]
+
 # Configure Google Generative AI
-genai.configure(api_key="AIzaSyCoS6U8WWaXWloC5sBFFCcco5zJqZCohJ8")
+genai.configure(api_key=genai_api_key)
 
 # Define the path to Poppler installed via Homebrew
 POPPLER_PATH = "/opt/homebrew/bin"  # Adjust this if Homebrew uses a different location
