@@ -8,7 +8,7 @@ import pdf2image
 import google.generativeai as genai
 
 # Load environment variables
-load_dotenv(dotenv_path="/Users/venkateshvidala/PycharmProjects/ATS/a.env")
+load_dotenv()
 genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
 
 # Configure Google Generative AI
