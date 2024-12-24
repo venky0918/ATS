@@ -8,14 +8,14 @@ import pdf2image
 import google.generativeai as genai
 
 # Load environment variables
-load_dotenv()
-
-# Retrieve API key from Streamlit secrets
-genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
-poppler_path = os.getenv("POPPLER_PATH")
+load_dotenv(dotenv_path="/Users/venkateshvidala/PycharmProjects/ATS/a.env")
+#genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
 
 # Configure Google Generative AI
-genai.configure(api_key=genai_api_key)
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise RuntimeError("API Key for Google Generative AI is not set in the environment variables.")
+genai.configure(api_key=api_key)
 
 # Function to get generative response
 def get_gemini_response(input, pdf_content, prompt):
@@ -27,20 +27,18 @@ def get_gemini_response(input, pdf_content, prompt):
 def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
         try:
-            # Convert the PDF to images using pdf2image
-            images = pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path=poppler_path)
+            images = pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path="/opt/homebrew/bin")
             first_page = images[0]
 
-            # Convert the first page to bytes
+            # Convert to bytes
             img_byte_arr = io.BytesIO()
             first_page.save(img_byte_arr, format='JPEG')
             img_byte_arr = img_byte_arr.getvalue()
 
-            # Prepare the image data for further processing
             pdf_parts = [
                 {
                     "mime_type": "image/jpeg",
-                    "data": base64.b64encode(img_byte_arr).decode()  # Encode to base64
+                    "data": base64.b64encode(img_byte_arr).decode()  # encode to base64
                 }
             ]
             return pdf_parts
@@ -52,16 +50,19 @@ def input_pdf_setup(uploaded_file):
 # Streamlit App
 st.set_page_config(page_title="ATS Resume Advisor")
 st.header("ATS Insights")
+
+# Inputs
 input_text = st.text_area("About the Job", key="input")
 uploaded_file = st.file_uploader("Submit Your Resume for Review (PDF)", type=["pdf"])
 
 if uploaded_file is not None:
     st.write("PDF Uploaded Successfully")
 
-submit1 = st.button("Resume Review and Candidate Assessment")
-submit3 = st.button("Resume Match and Optimization Review")
+# Buttons
+submit1 = st.button("Resume Review and Candidate Assessment", disabled=(uploaded_file is None))
+submit3 = st.button("Resume Match and Optimization Review", disabled=(uploaded_file is None))
 
-# Input prompts
+# Prompts
 input_prompt1 = """
 You are an experienced Technical Human Resource Manager, tasked with reviewing the provided resume against the job description. 
 Begin by evaluating the candidate’s qualifications, skills, and experience, and determine how well they align with the role. 
@@ -72,6 +73,7 @@ Additionally, consider factors such as the candidate’s cultural fit with the o
 Lastly, offer suggestions for the applicant to improve their profile, if applicable.
 """
 
+
 input_prompt3 = """
 You are an advanced ATS (Applicant Tracking System) with expert knowledge in data science and ATS operations. 
 Your task is to evaluate the provided resume against the job description. 
@@ -81,27 +83,22 @@ Additionally, identify any overrepresented keywords or skills that might be irre
 Finally, offer an overall evaluation, summarizing how well the resume fits the job description, highlighting key strengths such as relevant experience and skills, as well as areas for improvement such as missing qualifications, experience gaps, or potential misalignments with the job’s primary needs. 
 Include suggestions for how the resume can be optimized to improve alignment with the job description."""
 
-# Handle button clicks
+
+# Button Handlers
 if submit1:
-    if uploaded_file is not None:
-        try:
-            pdf_content = input_pdf_setup(uploaded_file)
-            response = get_gemini_response(input_prompt1, pdf_content, input_text)
-            st.subheader("The Response is")
-            st.write(response)
-        except Exception as e:
-            st.error(f"Error: {e}")
-    else:
-        st.error("Please upload the resume.")
+    try:
+        pdf_content = input_pdf_setup(uploaded_file)
+        response = get_gemini_response(input_text, pdf_content, input_prompt1)
+        st.subheader("The Response is")
+        st.write(response)
+    except Exception as e:
+        st.error(f"Error: {e}")
 
 elif submit3:
-    if uploaded_file is not None:
-        try:
-            pdf_content = input_pdf_setup(uploaded_file)
-            response = get_gemini_response(input_prompt3, pdf_content, input_text)
-            st.subheader("The Response is")
-            st.write(response)
-        except Exception as e:
-            st.error(f"Error: {e}")
-    else:
-        st.error("Please upload the resume.")
+    try:
+        pdf_content = input_pdf_setup(uploaded_file)
+        response = get_gemini_response(input_text, pdf_content, input_prompt3)
+        st.subheader("The Response is")
+        st.write(response)
+    except Exception as e:
+        st.error(f"Error: {e}")
