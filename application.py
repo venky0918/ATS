@@ -9,7 +9,7 @@ import google.generativeai as genai
 
 # Load environment variables
 load_dotenv(dotenv_path="/Users/venkateshvidala/PycharmProjects/ATS/a.env")
-#genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
+genai_api_key = st.secrets["general"]["GENAI_API_KEY"]
 
 # Configure Google Generative AI
 api_key = os.getenv("GOOGLE_API_KEY")
